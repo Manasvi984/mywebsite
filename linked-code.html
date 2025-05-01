@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- FontAwesome CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .dashboard-container {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 20%;
+            background: #007bff;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background: #0056b3;
+        }
+        .main-content {
+            width: 80%;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #007bff;
+        }
+        .graphs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .graph-container {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px; /* Reduced the size */
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>DelishFOOD Dashboard</h2>
+            <a href="#">Dashboard</a>
+            <a href="add_product.php">Add and Delete Product</a>
+            <a href="manage_order.php">Manage Order</a>
+            <a href="manage_users.php">Manage User</a>
+            <a href="manage_payments.php">Manage Payment</a>
+            <a href="view_feedback.php">View Feedback</a>
+            <a href="update_stock.php">Update Stock</a>
+            <a href="logout1.php">Logout</a>
+        </div><!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Welcome to the Admin Dashboard</h1>
+        </div>
+        <div class="graphs">
+            <!-- Orders Graph -->
+            <div class="graph-container">
+                <canvas id="ordersChart"></canvas>
+            </div>
+            <!-- Payments Graph (Only UPI) -->
+            <div class="graph-container">
+                <canvas id="paymentsChart"></canvas>
+            </div>
+            <!-- Feedback Graph -->
+            <div class="graph-container">
+                <canvas id="feedbackChart"></canvas>
+            </div>
+            <!-- Users Graph -->
+            <div class="graph-container">
+                <canvas id="usersChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Orders Chart (Bar Graph)
+    const ordersData = [120, 90, 150, 200, 180]; // Replace with your data
+    const ordersLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May']; // Replace with your data
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    new Chart(ordersCtx, {
+        type: 'bar',
+        data: {
+            labels: ordersLabels,
+            datasets: [{
+                label: 'Completed Orders',
+                data: ordersData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Monthly Completed Orders' }
+            },
+            maintainAspectRatio: false
+        }
+    });
+
+    // Payments Chart (Pie Chart - Only UPI)
+    const paymentsData = [3000]; // Only UPI data
+    const paymentsLabels = ['UPI']; // Only UPI label
+    const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
+    new Chart(paymentsCtx, {
+        type: 'pie',
+        data: {
+            labels: paymentsLabels,
+            datasets: [{
+                data: paymentsData,
+                backgroundColor: ['#007bff'], // Only UPI
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Payment Methods' }
+            },
+            maintainAspectRatio: false
+        }
+    });
+
+    // Feedback Chart (Line Graph)
+    const feedbackData = [4.5, 3.8, 4.2, 4.0, 4.8]; // Replace with your data
+    const feedbackLabels = ['User1', 'User2', 'User3', 'User4', 'User5']; // Replace with your data
+    const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
+    new Chart(feedbackCtx, {
+        type: 'line',
+        data: {
+            labels: feedbackLabels,
+            datasets: [{
+                label: 'Ratings',
+                data: feedbackData,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Feedback Ratings' }
+            },
+            maintainAspectRatio: false
+        }
+    });
+
+    // Users Chart (Line Graph)
+    const usersData = [50, 60, 75, 80, 95]; // Example data (replace with actual data)
+    const usersLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May']; // Example labels (replace with actual data)
+    const usersCtx = document.getElementById('usersChart').getContext('2d');
+    new Chart(usersCtx, {
+        type: 'line',
+        data: {
+            labels: usersLabels,
+            datasets: [{
+                label: 'Active Users',
+                data: usersData,
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Active Users Over Time' }
+            },
+            maintainAspectRatio: false
+        }
+    });
+</script>
+
+</body>
+</html>

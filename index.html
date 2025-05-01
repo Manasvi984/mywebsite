@@ -1,0 +1,305 @@
+<?php
+session_start(); // Start the session at the top before any HTML output
+
+// Simulated login: Replace with actual database login session
+$_SESSION['username'] = $_SESSION['username'] ?? 'Manasvi Gupta'; // Example username
+$_SESSION['email'] = $_SESSION['email'] ?? 'manasvi@example.com'; // Example email
+
+$username = trim($_SESSION['username']);
+$email = trim($_SESSION['email']);
+
+// Extract first letter for profile icon
+preg_match('/[A-Za-z]/', $username, $matches);
+$firstLetter = isset($matches[0]) ? strtoupper($matches[0]) : 'U';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<link rel="stylesheet" href="dd.css">
+<style>
+/* Profile styles */
+.profile-container {
+    position: absolute;
+  top: 70px;
+  right: 80px;
+  display: none;
+  width: 250px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  padding: 15px;
+  text-align: left;
+  z-index: 1000;
+}
+
+.profile-container ul {
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+}
+
+.profile-container ul li {
+    padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+.profile-container ul li:last-child {
+  border-bottom: none;
+}
+
+.profile-container ul li:hover {
+  background-color: #f5f5f5;
+}
+
+.profile-icon {
+    width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #5c6bc0;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: absolute;
+  top: 25px;
+  right: 80px;
+}
+/* Logout emoji */
+.logout-emoji {
+  font-size: 24px;
+  display: none;
+}
+</style>
+<meta name="viewport" content="width=device-width, initial-scale-1.0">
+<title>Delish Dish</title>
+</head>
+<body>
+<section class="menu">
+<div class="nav">
+    <img align="left" src="ddlogo.jpeg" alt="company logo" class="top-corner">
+    <div class="logo"><h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">Delish<b> Dish</b></h1></div>
+  <ul>
+<li><a class="active" href="dd.php" >Home</a></li>
+<li><a  class="active" href="order.php" >Menu</a></li>
+<li><a class="active" href="about.php">About</a></li>
+<li><a class="active" href="rating1.php">Rating</a></li>
+<li><a class="active" href="contact.php">Contact</a></li>
+
+</ul>
+<div class="button">
+   <button class="signup" type="signup" onclick="window.location.href='login.php';">Login</button>
+</div>
+</div>
+ </div>
+<body>
+
+<!-- Profile Icon -->
+<div class="profile-icon" id="profileIcon">
+    <span id="profileLetter"><?php echo $firstLetter; ?></span>
+    <span class="logout-emoji" id="logoutEmoji">👋</span>
+</div>
+
+<!-- Profile Dropdown -->
+<div class="profile-container" id="profileContainer">
+    <ul>
+        <li><strong><?php echo $username; ?></strong></li>
+        <!-- Display email in dropdown -->
+        <li id="userEmail"><?php echo htmlspecialchars($email); ?></li>
+        <li onclick="logout()">Logout</li>
+    </ul>
+</div>
+<!-- JavaScript for Profile Toggle -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const profileIcon = document.getElementById('profileIcon');
+    const profileContainer = document.getElementById('profileContainer');
+    const logoutEmoji = document.getElementById('logoutEmoji');
+    const profileLetter = document.getElementById('profileLetter');
+    const userEmail = document.getElementById('userEmail');
+
+    // Ensure email is correctly retrieved
+    console.log("User email in dropdown: ", userEmail.textContent);
+
+    // Toggle dropdown when clicking on profile icon
+    profileIcon.addEventListener('click', function(event) {
+        event.stopPropagation();
+        profileContainer.style.display = (profileContainer.style.display === 'none' || profileContainer.style.display === '') ? 'block' : 'none';
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!profileContainer.contains(event.target) && event.target !== profileIcon) {
+            profileContainer.style.display = 'none';
+        }
+    });
+
+    // Logout function
+    window.logout = function() {
+        fetch('logout.php')
+            .then(response => {
+                profileLetter.style.display = 'none'; // Hide initial letter
+                logoutEmoji.style.display = 'inline'; // Show logout emoji
+                profileContainer.style.display = 'none'; // Hide dropdown
+                setTimeout(() => {
+                    window.location.href = "dd.php"; // Redirect after logout
+                }, 500);
+            });
+    };
+});
+</script>
+
+
+
+<!-- Video Section -->
+<section class="video-section">
+    <div class="video-container">
+        <!-- YouTube embed with autoplay and loop enabled -->
+        <iframe class="responsive-video" src="https://www.youtube.com/embed/WWmu6dndxAM?autoplay=1&mute=0&loop=1&playlist=WWmu6dndxAM" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</section>
+<section class="grid">
+<div class="content">
+<div class="content-left">
+<!-- Content placed on top of the video -->
+<div class="contact-info">
+            <h2>Order Your Best <br>Food Anytime</h2>
+            <p>Hey, our delicious food is waiting for you,<br> We are always near to you with fresh items of food</p>
+        </div>>
+</div>
+</div>
+<!--<div class="circle-image" align="right">
+    <img src="https://shwetainthekitchen.com/wp-content/uploads/2021/10/sev-puri-360x360.jpg" alt="Circular Image">
+    </div>-->
+<div class="content-right"></div>
+</div>
+
+<h2 style="text-align: center; display: block; margin: 20px auto; font-size: 30px; font-weight: bold; color: #333;">
+    Let's Know About This Dishes
+</h2>
+
+<div class="scrolling-container">
+    <div class="scrolling-content">
+        <!-- Add items (photos and text) here -->
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse1.mm.bing.net/th?id=OIP.xfiAiWhITLa81ZrnPHSZVgHaFj&pid=Api&P=0&h=220" alt="Photo 1">
+            </a>
+            <p>The delish union of a Bhel Puri and chopsuey results in a classic Chinese Bhel, a well-known Indo-Chinese style snack from the Indian street food scene. The dish is most popular in Mumbai, Maharashtra, though, street food vendors in other cities too may have their own unique variations.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse2.mm.bing.net/th?id=OIP.IejK-E1rEw4G-U7kXo1pUAHaHW&pid=Api&P=0&h=220" alt="Photo 2">
+            </a>
+            <p>Vada Pav is sold in shops, outside of schools and colleges all over Mumbai because it is so popular and loved by street food lovers. It is one of the most humble street foods in Mumbai, yet it is tasty and delicious. Vada pav basically has Batata Vada which is sandwiched between two slices of a pav.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse2.mm.bing.net/th?id=OIP._6a8sYcXkq6m44dXJyFd5wHaE6&pid=Api&P=0&h=220" alt="Photo 3">
+            </a>
+            <p>A dosa, dosey, dosai, dosha is a thin, savory crepe in Indian cuisine made from a fermented batter of ground black gram and rice. Dosas are served hot, often with chutney and sambar (a lentil-based vegetable stew). Dosas are a common food in South India and North Sri Lanka.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse1.mm.bing.net/th?id=OIP.xDHvVqrqS5hmEj3I8H4M1gHaJ4&pid=Api&P=0&h=220" alt="Photo 4">
+            </a>
+            <p>Medu Vadas are a traditional South Indian dish which can be served as a main course, side dish, or snack. This crispy deliciousness is made with spiced urad dal batter and fried in donut-shaped dumplings. They are crispy on the outside and soft on the inside. They are served with Sambar and Coconut Chutney.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse2.mm.bing.net/th?id=OIP.-LaTjueyW6mzcvZu0GFbzgHaHa&pid=Api&P=0&h=220" alt="Photo 5">
+            </a>
+            <p>Noodles are a staple food in many cultures and made into a variety of shapes. The most common noodles are those derived from either Chinese cuisine or Italian cuisine. Chinese noodles are known by a variety of different names, while Italian noodles are known as pasta.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse1.mm.bing.net/th?id=OIP.ME1ARlBF01EgdvkjNmZ11gHaFu&pid=Api&P=0&h=220" alt="Photo 6">
+            </a>
+            <p>Pani Puri is a popular Indian street food consisting of crispy, hollow puris (bread) filled with flavored water, tamarind chutney, chili powder, and various fillings like chickpeas, onions, and potatoes.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse1.mm.bing.net/th?id=OIP.obA0F-rM3yQcHKXcrK3TPAHaE7&pid=Api&P=0&h=220" alt="Photo 7">
+            </a>
+            <p>Upma is a flavorful, tasty, savory, and popular South Indian breakfast made with semolina flour (called rava or suji), lentils, nuts, vegetables, herbs, and spices.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse3.mm.bing.net/th?id=OIP.m6VnbzsHAMunYHeSNAEJVQHaHZ&pid=Api&P=0&h=220" alt="Photo 8">
+            </a>
+            <p>Dabeli is a renowned street food mainly found on the streets of Gujarat and Mumbai. This Indian burger with a sweet, spicy, and tangy potato filling tastes delicious.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse3.mm.bing.net/th?id=OIP.1Cljuj1bHWxKfDWcGjQaBAHaE8&pid=Api&P=0&h=220" alt="Photo 9">
+            </a>
+            <p>This mouth-watering chole samosa chaat is an ever-popular road-side treat in Delhi, and you can find several vendors equipped with large, flat kadhais where the chole keeps simmering, ready to accompany crisp samose with snazzy toppings.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse4.mm.bing.net/th?id=OIP.xMFlVgaLxrGyJJd7vdoT3QHaLO&pid=Api&P=0&h=220" alt="Photo 10">
+            </a>
+            <p>Veg Cutlet is a popular deep-fried snack or patty made from boiled and mashed vegetables. It's a sought-after snack for vegetarians and is commonly served with a cup of tea.</p>
+        </div>
+        <div class="item">
+            <a href="order.php">
+                <img src="https://tse2.mm.bing.net/th?id=OIP.HbWTVr1RXht8UwH3r38V6wHaHa&pid=Api&P=0&h=220" alt="Photo 11">
+            </a>
+            <p>Sabudana vada, or 'sabu vada', is a traditional deep-fried fritter from Maharashtra, India. It's made from tapioca pearls (sabudana), mashed potatoes, peanuts, and spices.</p>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<h1 style="text-align: center;">Welcome to Delish Dish</h1>
+  <p style="text-align: center;">  At our canteen, we believe that good food has the power to bring people together, energize the body, and uplift the spirit. Nestled in the heart, our canteen is more than just a place to eat it's a gathering spot where friends, colleagues, and families come to enjoy delicious meals in a warm and friendly environment.
+ 
+    <h3 style="text-align: center;">Our Mission</h3>
+   <p style="text-align: center;"> Our mission is to offer a variety of wholesome and tasty dishes at affordable prices. We are committed to using fresh, high-quality ingredients to create meals that not only satisfy hunger but also nourish the body and soul.
+    From hearty traditional recipes to light and healthy options, we are committed to serving food that satisfies both your appetite and your well-being. Affordability is key to our philosophy, ensuring that everyone can enjoy quality meals without breaking the bank. </p>
+    
+      <br>
+      <h3 style="text-align: center;">Our Team</h3>
+      <p style="text-align: center;">
+    
+        Our team of talented chefs and friendly staff are dedicated to providing excellent service and mouth-watering food. They take pride in their work and are always ready to greet you with a smile.
+        Behind every delicious meal is a team of passionate individuals who love what they do. Our chefs are culinary experts who constantly innovate to bring you exciting new dishes while preserving the essence of classic favorites.
+        </p>
+        
+       <h3 style="text-align: center;">Join Us</h3>
+       <p style="text-align: center;"> Come and experience the warm and inviting atmosphere of our canteen. Whether you're here for a quick bite or a leisurely meal, we promise to make your dining experience enjoyable and satisfying.
+        
+        Thank you for choosing our canteen. We look forward to serving you soon!</p>
+
+    </div>
+</style>
+</section>
+<br>
+<br>
+<!-- Footer Section -->
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Delish Dish. All Rights Reserved.</p>
+        <ul>
+            <li><a href="about.php">About Us</a></li>
+            <li><a href="contact.php">Contact</a></li>
+            <li><a href="terms.html">Terms & Conditions</a></li>
+        </ul>
+        
+    </div>
+</footer>
+
+
+<script src="dd.js"></script>
+
+
+</body>
+</html>

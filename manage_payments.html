@@ -1,0 +1,117 @@
+<?php
+session_start();
+include('db.php');
+
+// Fetch payment records with user details via orders table
+$query = "SELECT p.payment_id, p.order_id, o.user_id, u.username, u.email, p.upi_id, 
+                 p.amount, p.payment_date 
+          FROM payment p
+          JOIN orders o ON p.order_id = o.order_id
+          JOIN users u ON o.user_id = u.id
+          ORDER BY p.payment_date DESC";
+
+$result = $conn->query($query);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Payments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- FontAwesome CDN -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Back to Dashboard Link */
+        .back-to-dashboard {
+            font-size: 20px;
+            color: #007bff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .back-to-dashboard i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Icon-based Navigation to Admin Dashboard -->
+    <a href="linked-code.php" class="back-to-dashboard">
+        <i class="fa fa-home"></i> Back to Dashboard
+    </a>
+
+    <h2>Manage Payments</h2>
+    <table>
+        <tr>
+            <th>Payment ID</th>
+            <th>Order ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>UPI ID</th>
+            <th>Amount (₹)</th>
+            <th>Payment Date</th>
+        </tr>
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>{$row['payment_id']}</td>
+                        <td>{$row['order_id']}</td>
+                        <td>{$row['username']}</td>
+                        <td>{$row['email']}</td>
+                        <td>{$row['upi_id']}</td>
+                        <td>₹" . number_format($row['amount'], 2) . "</td>
+                        <td>{$row['payment_date']}</td>
+                      </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='7'>No payments found.</td></tr>";
+        }
+        ?>
+    </table>
+</div>
+
+</body>
+</html>

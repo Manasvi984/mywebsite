@@ -1,0 +1,51 @@
+<?php
+session_start();
+include('db.php');
+
+// Check if the user is an admin
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php"); // Redirect to login page if not an admin
+    exit();
+}
+
+// Fetch all users
+$sql = "SELECT id, username, email, role FROM users";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="admin-panel">
+        <h2>Admin Panel</h2>
+        <p>Welcome, <?php echo $_SESSION['username']; ?>! You are logged in as an admin.</p>
+        <h3>Manage Users</h3>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+
+            <?php while ($row = $result->fetch_assoc()) { ?>
+            <tr>
+                <td><?php echo $row['username']; ?></td>
+                <td><?php echo $row['email']; ?></td>
+                <td><?php echo $row['role']; ?></td>
+                <td>
+                    <a href="edit_user.php?id=<?php echo $row['id']; ?>">Edit</a>
+                    <a href="delete_user.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
+</body>
+</html>

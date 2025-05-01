@@ -1,0 +1,45 @@
+<?php
+session_start();
+include('db1.php'); // Ensure database connection is correct
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $product_id = $_POST['product_id'];
+
+    // Check if the product exists
+    $stmt = $conn->prepare("SELECT image_path FROM products WHERE product_id = ?");
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $product = $result->fetch_assoc();
+        $image_path = $product['image_path'];
+
+        // Delete associated rows in the orders table
+        $stmt = $conn->prepare("DELETE FROM orders WHERE product_id = ?");
+        $stmt->bind_param("i", $product_id);
+        $stmt->execute();
+
+        // Delete the product from the database
+        $stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
+        $stmt->bind_param("i", $product_id);
+        if ($stmt->execute()) {
+            // Delete the image file if it exists
+            if (!empty($image_path) && file_exists($image_path)) {
+                unlink($image_path);
+            }
+            header("Location: order.php?success=Product deleted successfully");
+            exit();
+        } else {
+            header("Location: order.php?error=Error deleting product");
+            exit();
+        }
+    } else {
+        header("Location: order.php?error=Product not found");
+        exit();
+    }
+} else {
+    header("Location: order.php?error=Invalid request");
+    exit();
+}
+?>

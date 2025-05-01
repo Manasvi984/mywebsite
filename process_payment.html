@@ -1,0 +1,57 @@
+<?php
+session_start();
+include('db.php');
+
+// Debug: Print the POST data
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Ensure user is logged in
+if (!isset($_SESSION['userid'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Ensure order details are received via POST
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: sandwich.php?error=invalid_access");
+    exit();
+}
+
+$user_id = $_SESSION['userid'];
+$product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+$product_name = isset($_POST['product_name']) ? htmlspecialchars($_POST['product_name']) : '';
+$quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
+$total_price = isset($_POST['total_price']) ? floatval($_POST['total_price']) : 0;
+$upi_id = $_POST['upi_id'] ?? '';
+$user_name = $_POST['user_name'] ?? '';
+$email = $_POST['email'] ?? '';
+
+// First, insert the order into the orders table
+$stmt = $conn->prepare("INSERT INTO orders (user_id, product_id, quantity, total_price) VALUES (?, ?, ?, ?)");
+$stmt->bind_param("iiid", $user_id, $product_id, $quantity, $total_price);
+
+if ($stmt->execute()) {
+    // Order inserted successfully, get the new order_id
+    $order_id = $stmt->insert_id;
+
+    // Now insert payment details into the payment table
+    $stmt_payment = $conn->prepare("INSERT INTO payment (order_id, user_name, email, upi_id, amount) VALUES (?, ?, ?, ?, ?)");
+    $stmt_payment->bind_param("isssd", $order_id, $user_name, $email, $upi_id, $total_price);
+
+    if ($stmt_payment->execute()) {
+        // Redirect to order confirmation
+        header("Location: order_confirmation.php?order_id=" . $order_id);
+        exit();
+    } else {
+        echo "Error processing payment: " . $stmt_payment->error;
+    }
+    
+    $stmt_payment->close();
+} else {
+    echo "Error processing order: " . $stmt->error;
+}
+
+$stmt->close();
+$conn->close();
+?>

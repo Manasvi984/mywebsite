@@ -1,0 +1,171 @@
+/* General Styles */
+body {
+    margin: 0 100px;
+    background-color: #ffeae0;
+    font-family: 'Roboto', sans-serif;
+    justify-content: center;
+    overflow-x: hidden;
+    animation: fadeInBackground 1s ease-in-out;
+}
+
+/* Navigation (Your Original CSS Kept) */
+.nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 80px;
+    background-color: #ffc7ad;
+    animation: slideDown 1s ease;
+}
+
+.nav img {
+    width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    animation: zoomIn 1s ease-in-out;
+}
+
+.nav ul {
+    display: flex;
+    list-style: none;
+}
+
+.nav ul li {
+    margin-right: 30px;
+}
+
+.nav ul li a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: 500;
+    font-size: 17px;
+    position: relative;
+}
+
+.nav ul li a:hover {
+    color: #ff511c;
+    animation: hoverUnderline 0.3s forwards;
+}
+
+/* Hero Section */
+.hero {
+    background: url('hero-bg.jpg') no-repeat center center/cover;
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* About Section */
+.about-section {
+    text-align: center;
+    padding: 50px;
+    background: rgba(255, 234, 224, 0.9);
+    animation: fadeIn 2s ease-in-out;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.image-box {
+    width: 250px;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+.image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-box:hover {
+    transform: scale(1.05);
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    width: 100%;
+    padding: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-box:hover .overlay {
+    opacity: 1;
+}
+
+/* Mission Section */
+.mission {
+    background: #ffccbc;
+    padding: 50px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Team Section */
+.team {
+    padding: 50px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.team-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.team-member {
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.team-member img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.team-member:hover {
+    transform: scale(1.1);
+}
+
+/* Footer */
+footer {
+    background: #ff5722;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hoverUnderline {
+    from { width: 0; }
+    to { width: 100%; }
+}

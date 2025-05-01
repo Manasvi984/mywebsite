@@ -1,0 +1,237 @@
+body 
+{
+margin: 0 100px;
+background-color: #ffeae0;
+opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+.login-form button{
+    padding: 10px;
+    width: 45%;
+    border-radius: 10px;
+    border: 5;
+    outline: none;
+    font-size: 18px;
+    font-weight: 100;
+    margin: 10px 8px;
+    cursor: pointer;
+    background: linear-gradient(to right,#abc,#cba);
+    display: inline;
+}
+
+.nav {
+width: 100%;
+display: flex;
+justify-content: space-between;
+align-items: centre;
+padding: 15px 80px;
+background-color: #ffc7ad;
+background-size: cover;
+}
+.nav img{
+    width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    
+
+
+}
+.top-corner{
+    position: absolute;
+    width: 100px;
+    left: 0;
+    top: 0;
+    height: auto;
+}
+.nav.logo h1
+{
+font-weight: 600;
+font-family: sans serif;
+color: #000000;
+}
+.nav ul 
+{
+display: flex;
+list-style: none;
+}
+.nav ul li
+{
+margin-right: 30px;
+}
+.nav ul li a
+{
+text-decoration: none; 
+color: #000000;
+font-weight: 500;
+font-family: sans serif;
+font-size: 17px;
+}
+.nav ul li a:hover {
+  color: #ff511c;
+}
+
+.nav ul.active::after {
+content: ' ' ;
+width: 50%;
+height: 3px;
+background-color: #ff511c;
+position: relative;
+margin-left: 10px;
+}
+
+
+button {
+    background: #ff5722;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #e64a19;
+}
+
+.dish-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 1200px;
+    animation: fadeIn 1s ease-out;
+    opacity: 0; /* Start with it invisible */
+    
+}
+
+.dish-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    width: 250px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.dish-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.dish-card:hover {
+    transform: scale(1.05);
+}
+
+.dish-info {
+    padding: 15px;
+}
+
+.dish-info h3 {
+    margin: 10px 0;
+    color: #333;
+}
+
+.dish-info p {
+    color: #777;
+    font-size: 14px;
+}
+
+.dish-info button {
+    background-color: #ff6b6b;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin: 10px auto; /* Centers the button */
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    display: block; /* Ensures the button takes full width of the container */
+    text-align: center;
+}
+.dish-info button:hover {
+    background-color: #e05656;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.card {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  
+  /* Apply delay to each card */
+  .card:nth-child(1) {
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+  
+  .card:nth-child(2) {
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: 0.6s;
+  }
+  
+  .card:nth-child(3) {
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: 0.9s;
+  }
+  
+  .card:nth-child(4) {
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: 1.2s;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideInTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-top {
+    opacity: 0;
+    animation: slideInTop 1s ease-out forwards;
+}
+
+  
