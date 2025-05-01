@@ -1,0 +1,179 @@
+<?php
+session_start();
+include('db.php');
+
+// Check if user is logged in
+if (!isset($_SESSION['userid'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get product details from URL
+$product_id = $_GET['product_id'] ?? '';
+$product_name = $_GET['product_name'] ?? '';
+$price = $_GET['price'] ?? '';
+
+// Check if the product is in stock
+$stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE product_id = ?");
+$stmt->bind_param("i", $product_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    // Product not found
+    echo "<script>alert('Product not found!'); window.location.href='order.php';</script>";
+    exit();
+}
+
+$product_data = $result->fetch_assoc();
+if ($product_data['stock_quantity'] <= 0) {
+    // Product out of stock
+    echo "<script>alert('Sorry, ".$product_name." is out of stock!'); window.location.href='order.php';</script>";
+    exit();
+}
+
+// Fetch user details
+$user_id = $_SESSION['userid'];
+$stmt = $conn->prepare("SELECT username, email FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user_data = $result->fetch_assoc();
+
+// Get available stock quantity
+$available_stock = $product_data['stock_quantity'];
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="sandwich.css">
+    <style>
+        .stock-info {
+            background-color: #e6f7ff;
+            color: #0066cc;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Order Details</h1>
+        
+        <div class="stock-info">
+            Available: <?php echo $available_stock; ?> items in stock
+        </div>
+        
+        <div class="product-info">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Customer Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><?php echo htmlspecialchars($product_name); ?></td>
+                        <td id="productPrice">₹<?php echo htmlspecialchars($price); ?></td>
+                        <td>
+                            <button type="button" id="decreaseBtn" class="quantity-btn">-</button>
+                            <span id="quantity">1</span>
+                            <button type="button" id="increaseBtn" class="quantity-btn">+</button>
+                        </td>
+                        <td><?php echo htmlspecialchars($user_data['username']); ?></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <form action="payment.php" method="POST" id="orderForm">
+                <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
+                <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($product_name); ?>">
+                <input type="hidden" name="price" value="<?php echo $price; ?>">
+                <input type="hidden" name="quantity" id="quantityInput" value="1">
+                <input type="hidden" name="available_stock" value="<?php echo $available_stock; ?>">
+                <button type="submit" class="pay-btn">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Debug function
+        function debug(message) {
+            console.log('Debug:', message);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            debug('DOM fully loaded');
+
+            // Get all necessary elements
+            const decreaseBtn = document.getElementById('decreaseBtn');
+            const increaseBtn = document.getElementById('increaseBtn');
+            const quantityElement = document.getElementById('quantity');
+            const quantityInput = document.getElementById('quantityInput');
+            const productPriceElement = document.getElementById('productPrice');
+            const availableStock = <?php echo $available_stock; ?>;
+
+            // Get the base price (remove the ₹ symbol and parse as float)
+            const priceText = productPriceElement.textContent.replace('₹', '');
+            const basePrice = parseFloat(priceText);
+            
+            debug('Base price: ' + basePrice);
+
+            // Function to update quantity and price
+            function updateDisplay(newQuantity) {
+                debug('Updating display with quantity: ' + newQuantity);
+                
+                // Update quantity display and hidden input
+                quantityElement.textContent = newQuantity;
+                quantityInput.value = newQuantity;
+
+                // Calculate and update total price
+                const totalPrice = (newQuantity * basePrice).toFixed(2);
+                productPriceElement.textContent = '₹' + totalPrice;
+                
+                debug('New total price: ' + totalPrice);
+            }
+
+            // Add click event listeners
+            decreaseBtn.addEventListener('click', function() {
+                debug('Decrease button clicked');
+                const currentQty = parseInt(quantityElement.textContent);
+                if (currentQty > 1) {
+                    updateDisplay(currentQty - 1);
+                }
+            });
+
+            increaseBtn.addEventListener('click', function() {
+                debug('Increase button clicked');
+                const currentQty = parseInt(quantityElement.textContent);
+                if (currentQty < availableStock) {
+                    updateDisplay(currentQty + 1);
+                } else {
+                    alert('Sorry, only ' + availableStock + ' items are available in stock.');
+                }
+            });
+
+            // Validate form submission
+            document.getElementById('orderForm').addEventListener('submit', function(e) {
+                const quantity = parseInt(quantityInput.value);
+                if (quantity > availableStock) {
+                    e.preventDefault();
+                    alert('Sorry, only ' + availableStock + ' items are available in stock.');
+                }
+            });
+
+            debug('Event listeners attached');
+        });
+    </script>
+</body>
+</html>

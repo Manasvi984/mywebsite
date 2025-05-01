@@ -1,0 +1,762 @@
+<?php
+session_start();
+include('db.php');
+
+// Fetch all products from database
+$sql = "SELECT * FROM products";
+$result = $conn->query($sql);
+$products = $result->fetch_all(MYSQLI_ASSOC);
+
+
+
+
+// Debugging: Print username (Remove this after testing)
+error_log("Username in session: " . ($_SESSION['username'] ?? 'Not Set'));
+
+// Simulated login: Replace with actual database login session
+$_SESSION['username'] = $_SESSION['username'] ?? 'Manasvi Gupta'; // Example username
+
+// Get the username and extract the first alphabetic letter
+$username = trim($_SESSION['username'] ?? 'User'); // Remove extra spaces
+
+// Extract first alphabetic character (ignores numbers/symbols)
+preg_match('/[A-Za-z]/', $username, $matches);
+
+// If found, use it; otherwise, default to 'U'
+$firstLetter = isset($matches[0]) ? strtoupper($matches[0]) : 'U';
+
+error_log("Extracted first letter: " . $firstLetter); // Debugging log
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible"        content="IE=edge">
+
+<link rel="stylesheet" href="about.css">
+<style>
+body 
+{
+margin: 0px 0px;
+background-color: #ffeae0;
+min-height: 100vh;
+min-height: 40px;
+min-width: 40px;
+overflow-x: hidden;
+}
+.login-form button{
+    padding: 10px;
+    width: 45%;
+    border-radius: 10px;
+    border: 5;
+    outline: none;
+    font-size: 18px;
+    font-weight: 100;
+    margin: 10px 8px;
+    cursor: pointer;
+    background: linear-gradient(to right,#abc,#cba);
+    display: inline;
+}
+
+
+
+.nav {
+width: 100%;
+display: flex;
+justify-content: space-between;
+align-items: centre;
+padding: 15px 80px;
+background-color: #ffc7ad;
+background-size: cover;
+position: relative; 
+}
+.nav img{
+    width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    
+
+
+}
+.top-corner{
+    position: absolute;
+    width: 100px;
+    left: 0;
+    top: 0;
+    height: auto;
+}
+.nav .logo {
+  flex-grow: 1;  /* Allow the title to take up the remaining space */
+  text-align: center;
+}
+.nav.logo h1
+{
+font-weight: 600;
+font-family: sans serif;
+color: #000000;
+margin: 0;
+  font-size: 32px;
+}
+
+
+.nav ul 
+{
+display: flex;
+list-style: none;
+}
+.nav ul li
+{
+margin-right: 30px;
+}
+.nav ul li a
+{
+text-decoration: none; 
+color: #000000;
+font-weight: 500;
+font-family: sans serif;
+font-size: 17px;
+}
+.nav ul li a:hover {
+  color: #ff511c;
+}
+
+
+.nav ul.active::after {
+content: ' ' ;
+width: 50%;
+height: 3px;
+background-color: #ff511c;
+position: relative;
+margin-left: 10px;
+}
+
+
+
+
+
+button {
+    background: #ff5722;
+    color: #fff;
+    padding: 10px 10px;
+    border: none;
+    border-radius: 3px;
+    margin-left: 100px;
+    margin-right: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.signup{
+    margin-left: 80px;
+    margin-right: 250px;
+}
+.btn {
+  background-color: #ff5722;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-left: 100px;
+  margin-right: 0px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+btn:hover {
+  background-color: #e64a19;
+}
+
+
+.content{
+display: grid; 
+grid-template-columns: 50% auto;
+gap: 30px;
+margin-top: 120px;
+align-items: centre; 
+justify-content: space-between; 
+width: 100%;
+}
+
+.content .content-left {
+display: block; 
+width: 100%;
+}
+.content .content-left .info{
+max-width: 100%;
+display: flex;
+flex-direction: column;
+}
+.content .content-left .info h2
+{
+font-size: 60px;
+font-family: sans serif;
+margin-bottom: 30px;
+animation: slideIn 3s ease-in-out ;
+}
+
+.content .content-left .info p
+{
+font-size: 20px;
+line-height: 2pc;
+font-size: large;
+font-family: sans serif;
+margin-bottom: 30px;
+animation: fadeIn 4s ease-in-out ;
+}
+.circle-image img {
+    display: block;
+    width: 500px; 
+    height: auto;
+    margin-left: 5px;
+    margin-right:1000px;
+    position: relative;
+    animation: rotate 15s linear infinite;
+    object-fit: cover; 
+    border-radius: 50%;
+    border: 3px solid #fff; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+@keyframes rotate {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{transform: rotate(360deg);}
+}
+
+
+
+
+
+
+
+
+/* Scrolling container */
+.scrolling-container {
+    width: 100%;
+    overflow: hidden; /* Hide the content that overflows */
+    background-color: #f0f0f0; /* Background color for container */
+    padding: 20px 0; /* Optional padding for top and bottom */
+}
+
+/* Scrolling content */
+.scrolling-content {
+    display: flex; /* Use flexbox to arrange items horizontally */
+    animation: slide 25s linear infinite; /* Apply the sliding animation */
+}
+
+/* Item styling */
+.item {
+    display: inline-block;
+    width: 200px; /* Set width of each item */
+    margin: 0 20px; /* Add margin between items */
+    text-align: center; /* Center align text below image */
+    vertical-align: top; /* Ensure text is aligned to the top */
+}
+
+/* Image styling - Ensures square images */
+.item img {
+    width: 200px; /* Set the width of the image */
+    height: 200px; /* Set the height to be the same as the width */
+    object-fit: cover; /* Ensures the image fills the area without distortion */
+}
+
+/* Text styling */
+.item p {
+    margin-top: 15px; /* Add space between image and text */
+    font-size: 14px;
+    line-height: 1.5; /* Space between lines of text */
+    height: auto; /* Let the height adjust to the content */
+    width: 100%; /* Ensure paragraph spans the full width of the item */
+    padding: 0 10px; /* Padding for text to prevent it from touching the edges */
+    text-align: left; /* Align text to the left */
+}
+
+/* Sliding animation */
+@keyframes slide {
+    0% {
+        transform: translateX(0); /* Start at the beginning */
+    }
+    100% {
+        transform: translateX(-100%); /* Slide content off to the left */
+    }
+}
+
+/* Footer Styles */
+.footer {
+  background-color: #ff5722;/* Set footer background color to black */
+  color: #ffffff;  /* Set text color to white */
+  text-align: center;
+  padding: 40px 20px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100vh;  /* Ensure it covers the full height of the screen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  animation: slideUp 1s ease-out forwards;
+  opacity: 0;  /* Initially hidden */
+}
+
+
+/* Footer Content Styling */
+.footer-content {
+  text-align: center;
+  color: #0f0101;
+}
+
+.footer-content p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.footer-content ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.footer-content ul li {
+  display: inline;
+  margin: 0 15px;
+  color: #e90d0d;  /* Set list items' color to white */
+}
+
+.footer-content ul li a {
+  color: #0a0101;  /* Set link color to white */
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.footer-content ul li a:hover {
+  color: #e90d0d;  /* Change hover color */
+}
+
+/* Social Media Links Styling */
+.social-media-links {
+  margin-top: 20px;
+}
+
+.social-media-links a {
+  margin: 0 10px;
+  display: inline-block;
+}
+
+.social-icon {
+  width: 30px;
+  height: 30px;
+  margin: 0 10px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.social-icon:hover {
+  transform: scale(1.2);  /* Slight scale effect on hover */
+}
+
+/* Slide-Up Animation */
+@keyframes slideUp {
+0% {
+    transform: translateY(100%);
+    opacity: 0;
+}
+100% {
+    transform: translateY(0);
+    opacity: 1;
+}
+}
+
+
+
+
+/* Contact Section Styling */
+.contact {
+  padding: 50px 80px;
+  background-color: #fff;
+  color: #333;
+}
+
+.contact-info {
+  margin-bottom: 30px;
+}
+
+.contact-info h2 {
+  font-size: 40px;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+}
+
+.contact-info p {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.contact-form {
+  margin-bottom: 30px;
+}
+
+.contact-form .input-group {
+  margin-bottom: 20px;
+}
+
+.contact-form .input-group label {
+  font-size: 18px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.contact-form .input-group input, 
+.contact-form .input-group textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.contact-form .input-group textarea {
+  resize: vertical;
+}
+
+.contact-details h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.contact-details p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.contact-details a {
+  text-decoration: none;
+  color: #ff5722;
+}
+
+.contact-details a:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Common navigation styles */
+.nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 80px;
+  background-color: #ffc7ad;
+  background-size: cover;
+}
+
+.nav img {
+  width: 100px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.nav.logo h1 {
+  font-weight: 600;
+  font-family: sans serif;
+  color: #000000;
+}
+
+.nav ul {
+  display: flex;
+  list-style: none;
+}
+
+.nav ul li {
+  margin-right: 30px;
+}
+
+.nav ul li a {
+  text-decoration: none;
+  color: #000000;
+  font-weight: 500;
+  font-family: sans serif;
+  font-size: 17px;
+}
+
+.nav ul li a:hover {
+  color: #ff511c;
+}
+
+.nav ul.active::after {
+  content: ' ';
+  width: 50%;
+  height: 3px;
+  background-color: #ff511c;
+  position: relative;
+  margin-left: 10px;
+}
+
+
+
+
+
+
+
+/* Footer Styles */
+footer {
+  background-color: #ff5722;
+  color: white;
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  animation: fadeIn 2s ease-out;
+}
+
+footer ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+footer ul li {
+  display: inline;
+  margin-right: 20px;
+}
+
+footer ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+footer ul li a:hover {
+  color: #ffc107;
+}
+
+/* Animations */
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 2s ease-out forwards;
+}
+
+.slide-up {
+  animation: slideUp 1s ease-out forwards;
+}
+
+
+/* Profile styles */
+.profile-container {
+  position: absolute;
+  top: 70px;
+  right: 80px;
+  display: none;
+  width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  padding: 20px;
+  text-align: left;
+  z-index: 1000;
+}
+
+.profile-container ul {
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+}
+
+.profile-container ul li {
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.profile-container ul li:hover {
+  background-color: #f5f5f5;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #5c6bc0;
+  color: white;
+  font-size: 20px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  position: absolute;
+  top: 25px;
+  right: 80px;
+}
+</style>
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale-1.0">
+<title>Delish Dish</title>
+</head>
+<body>
+<section class="menu">
+<div class="nav">
+    <img align="left" src="ddlogo.jpeg" alt="company logo" class="top-corner">
+    <div class="logo"><h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">Delish<b> Dish</b></h1></div>
+  <ul>
+<li><a class="active" href="index.html">Home</a></li>
+<li><a  class="active"href="order.html">Menu</a></li>
+<li><a class="active" href="about.html">About</a></li>
+<li><a class="active" href="rating1.html">Rating</a></li>
+<li><a class="active" href="contact.html">Contact</a></li>
+
+</ul>
+<div class="button">
+    
+
+    <button class="signup" type="signup" onclick="window.location.href='login.php';">Login</button>
+</div>
+</div>
+
+
+
+  </div>
+<!-- Profile Icon -->
+<div class="profile-icon" id="profileIcon">M</div>
+
+<!-- Profile Container -->
+<div class="profile-container" id="profileContainer">
+    <h3>Manasvi Gupta</h3>
+    <p>manasvigupta344@gmail.com</p>
+    <ul class="menu">
+        <li>Sync is on</li>
+        <li>Customize profile</li>
+        <li>Manage your Google Account</li>
+        <li>Close this profile</li>
+        <li>Other Chrome profiles</li>
+        <li>Open Guest profile</li>
+        <li>Add new profile</li>
+        <li>Manage Chrome profiles</li>
+    </ul>
+</div>
+</section>
+
+
+
+<main class="about-section">
+    <div class="container">
+        <h2>About Us</h2>
+        <p>
+            Welcome to <strong>Delish Dish</strong>, your go-to solution for convenient and delicious canteen meals. 
+            Our platform is designed to simplify the food ordering process, saving you time and hassle while ensuring 
+            you enjoy high-quality meals prepared with care.
+        </p>
+        <p>
+            Our mission is to enhance your canteen experience by providing a user-friendly platform where you can 
+            browse menus, place orders, and even track your food in real-time. We work closely with canteens to 
+            maintain high standards of hygiene, taste, and efficiency.
+        </p>
+        <p>
+            Whether you're a student, staff member, or visitor, we aim to serve you with meals that fuel your day.
+            Thank you for choosing <strong>Delish Dish</strong>.
+        </p>
+        <h2>Why Choose Us?</h2>
+        <p>
+            Say goodbye to long lines and waiting! Our user-friendly platform lets you browse the menu, place your order, 
+            and pick it up at your convenience. We prioritize freshness and quality in every dish. From locally sourced ingredients 
+            to hygienic preparation, your health and satisfaction are our top priorities. Choose Delish Dish for convenience, 
+            quality, and care—all in one place!
+        </p>
+    </div>
+
+    <h2>Our Popular Dishes</h2>
+    <div class="image-container">
+        <div class="image-box">
+            <img src="https://cdn.pixabay.com/photo/2022/11/01/05/18/coffee-7561288_640.jpg" alt="Beverages">
+            <div class="overlay">Beverages</div>
+        </div>
+        <div class="image-box">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRX9qC34Y0KLemEcxfj0YsKuWrGAPTjr-j0vg&s" alt="Snacks">
+            <div class="overlay">Snacks</div>
+        </div>
+        <div class="image-box">
+            <img src="https://tse2.mm.bing.net/th?id=OIP.wmH91aZP_lbzI2BzmhCqPAHaE8&pid=Api&P=0&h=220" alt="Fasting Items">
+            <div class="overlay">Fasting Items</div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer Section -->
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Delish Dish. All Rights Reserved.</p>
+        <ul>
+            <li><a href="about.php">About Us</a></li>
+            <li><a href="contact.php">Contact</a></li>
+            <li><a href="terms.html">Terms & Conditions</a></li>
+        </ul>
+        
+    </div>
+</footer>
+
+<!-- Profile Icon -->
+<div class="profile-icon" id="profileIcon"><?php echo $firstLetter; ?></div>
+
+<!-- Profile Container -->
+<div class="profile-container" id="profileContainer">
+</div>
+
+<!-- JavaScript for Profile Toggle -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const profileIcon = document.getElementById('profileIcon');
+        const profileContainer = document.getElementById('profileContainer');
+
+        profileIcon.addEventListener('click', function(event) {
+            profileContainer.style.display = (profileContainer.style.display === 'none' || profileContainer.style.display === '') ? 'block' : 'none';
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!profileContainer.contains(event.target) && event.target !== profileIcon) {
+                profileContainer.style.display = 'none';
+            }
+        });
+    });
+</script>
+</body>
+</html>

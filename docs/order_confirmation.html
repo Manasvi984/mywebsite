@@ -1,0 +1,61 @@
+<?php
+session_start();
+include('db1.php');
+
+if (!isset($_SESSION['userid']) || !isset($_GET['order_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$order_id = $_GET['order_id'];
+$user_id = $_SESSION['userid'];
+
+// Modified query with LEFT JOIN
+$stmt = $conn->prepare("
+    SELECT o.*, p.product_name, p.price, u.username, u.email 
+    FROM orders o 
+    JOIN users u ON o.user_id = u.id 
+    LEFT JOIN products p ON o.product_id = p.product_id
+    WHERE o.order_id = ? AND o.user_id = ?
+");
+$stmt->bind_param("ii", $order_id, $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$order = $result->fetch_assoc();
+
+// Handle deleted products
+if ($order['product_id'] === NULL) {
+    $product_name = "Deleted Product";
+    $price = "N/A";
+} else {
+    $product_name = htmlspecialchars($order['product_name']);
+    $price = $order['price'];
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="sandwich.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Order Confirmation</h1>
+        <div class="confirmation-details">
+            <h2>Thank you for your order!</h2>
+            <p>Order ID: #<?php echo $order_id; ?></p>
+            <p>Product: <?php echo $product_name; ?></p>
+            <p>Quantity: <?php echo $order['quantity']; ?></p>
+            <p>Total Price: ₹<?php echo $order['total_price']; ?></p>
+            <p>Customer: <?php echo htmlspecialchars($order['username']); ?></p>
+            
+            <button onclick="window.location.href='order.php'" class="order-btn">
+                Return to Menu
+            </button>
+        </div>
+    </div>
+</body>
+</html>

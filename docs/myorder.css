@@ -1,0 +1,76 @@
+body {
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ensure full viewport height */
+  margin: 0; /* Remove default margins */
+}
+
+.form-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 400px; /* Adjust width as needed */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+input[type="text"],
+input[type="email"] {
+  width: calc(100% - 12px); /* Account for padding and border */
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+input[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+#qr-scanner {
+  text-align: center; /* Center the QR code image */
+  margin-bottom: 10px;
+}
+
+#qr-scanner img {
+  max-width: 100%; /* Make sure image fits within container */
+  height: auto;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Optional: Style the error messages (if you display them inline) */
+.error-message {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 5px;
+}

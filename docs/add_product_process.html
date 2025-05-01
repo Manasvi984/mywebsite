@@ -1,0 +1,55 @@
+<?php
+session_start();
+include('db1.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $product_name = $_POST['product_name'];
+    $price = $_POST['price'];
+    
+    $target_dir = "uploads/";
+    if (!file_exists($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+    
+    $file_extension = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
+    $new_filename = uniqid() . '.' . $file_extension;
+    $target_file = $target_dir . $new_filename;
+    
+    // Check if image file is actual image
+    $check = getimagesize($_FILES["image"]["tmp_name"]);
+    if($check === false) {
+        header("Location: add_product.php?error=Invalid image file");
+        exit();
+    }
+    
+    // Check file size (5MB max)
+    if ($_FILES["image"]["size"] > 5000000) {
+        header("Location: add_product.php?error=File is too large");
+        exit();
+    }
+    
+    // Allow certain file formats
+    $allowed_types = array("jpg", "jpeg", "png", "gif");
+    if (!in_array($file_extension, $allowed_types)) {
+        header("Location: add_product.php?error=Invalid file type");
+        exit();
+    }
+    
+    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+        $stmt = $conn->prepare("INSERT INTO products (product_name, price, image_path) VALUES (?, ?, ?)");
+        $stmt->bind_param("sds", $product_name, $price, $target_file);
+        
+        if ($stmt->execute()) {
+            header("Location: add_product.php?success=Product added successfully");
+            exit();
+        } else {
+            unlink($target_file); // Delete uploaded file if database insert fails
+            header("Location: add_product.php?error=Database error");
+            exit();
+        }
+    } else {
+        header("Location: add_product.php?error=Error uploading file");
+        exit();
+    }
+}
+?>

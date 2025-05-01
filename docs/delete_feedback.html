@@ -1,0 +1,44 @@
+<?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Database configuration
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'userdb'; // Your database name
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+
+// Handle feedback deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    $id = intval($_POST['id']);
+
+    $sql = "DELETE FROM ratings WHERE id = ?";
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            // Use header() for redirection after successful deletion
+            header("Location: view_feedback.php"); // Redirect back to the view feedback page
+            exit;
+        } else {
+            echo "Error deleting feedback: " . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        echo "Error preparing statement: " . $conn->error;
+    }
+} else {
+    echo "Invalid request.";
+}
+
+$conn->close();
+?>

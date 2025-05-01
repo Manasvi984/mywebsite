@@ -1,0 +1,233 @@
+<?php
+session_start();
+include('db.php');
+
+if (!isset($_SESSION['userid'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Ensure order details are received via POST
+if ($_SERVER["REQUEST_METHOD"] !== "POST" || !isset($_POST['product_id'])) {
+    header("Location: sandwich.php?error=invalid_access");
+    exit();
+}
+
+$user_id = $_SESSION['userid'];
+$product_id = intval($_POST['product_id']);
+$product_name = htmlspecialchars($_POST['product_name']);
+$quantity = intval($_POST['quantity']);
+$price = floatval($_POST['price']);
+$total_price = $quantity * $price;
+
+// Check stock availability before processing payment
+$stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE product_id = ?");
+$stmt->bind_param("i", $product_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if($result->num_rows > 0) {
+    $product = $result->fetch_assoc();
+    
+    if($product['stock_quantity'] < $quantity) {
+        // Not enough stock
+        echo "<script>alert('Sorry, not enough items in stock!'); window.location.href='order.php';</script>";
+        exit();
+    } else {
+        // Update stock quantity
+        $stmt = $conn->prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?");
+        $stmt->bind_param("ii", $quantity, $product_id);
+        $stmt->execute();
+    }
+}
+$stmt->close();
+
+// Fetch user details
+$stmt = $conn->prepare("SELECT username, email FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$user_result = $stmt->get_result();
+$user_data = $user_result->fetch_assoc();
+$stmt->close();
+
+if (!$user_data) {
+    header("Location: sandwich.php?error=user_not_found");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            text-align: left;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .error {
+            border: 2px solid red;
+        }
+
+        .valid {
+            border: 2px solid green;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            text-align: left;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        #amount {
+            background: #f0f0f0;
+            font-weight: bold;
+            color: #333;
+            cursor: not-allowed;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Payment Details</h2>
+        <form action="process_payment.php" method="POST" onsubmit="return validateForm()">
+            <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+            <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
+            <input type="hidden" name="quantity" value="<?php echo $quantity; ?>">
+            <input type="hidden" name="total_price" value="<?php echo $total_price; ?>">
+            <input type="hidden" name="price" value="<?php echo $price; ?>">
+
+            <label for="user_name">Full Name:</label>
+            <input type="text" id="user_name" name="user_name" value="<?php echo htmlspecialchars($user_data['username']); ?>" readonly>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user_data['email']); ?>" readonly>
+
+            <label for="upi_id">UPI ID:</label>
+            <input type="text" id="upi_id" name="upi_id" required placeholder="example@upi">
+            <span class="error-message" id="upiError">Invalid UPI ID (e.g., example@upi).</span>
+
+            <label for="amount">Amount:</label>
+            <input type="text" id="amount" name="amount" value="₹<?php echo number_format($total_price, 2); ?>" readonly>
+
+            <button type="submit" id="submitBtn">Confirm Payment</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const upiInput = document.getElementById("upi_id");
+            const errorText = document.getElementById("upiError");
+            const submitBtn = document.getElementById("submitBtn");
+
+            function validateUPI() {
+                const upiRegex = /^[\w.-]+@[\w.-]+$/;
+                const upiValue = upiInput.value.trim();
+
+                if (upiRegex.test(upiValue)) {
+                    upiInput.classList.remove("error");
+                    upiInput.classList.add("valid");
+                    errorText.style.display = "none";
+                    submitBtn.disabled = false;
+                } else {
+                    upiInput.classList.remove("valid");
+                    upiInput.classList.add("error");
+                    errorText.style.display = "block";
+                    submitBtn.disabled = true;
+                }
+            }
+
+            // Live validation while typing
+            upiInput.addEventListener("input", validateUPI);
+
+            // Final validation before submission
+            window.validateForm = function() {
+                validateUPI();
+                return !submitBtn.disabled;
+            };
+        });
+    </script>
+</body>
+</html>

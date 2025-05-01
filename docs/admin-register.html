@@ -1,0 +1,117 @@
+<?php
+session_start();
+include('db.php'); // Database connection
+
+// Define variables to store error messages
+$adminErr = $usernameErr = $emailErr = $passwordErr = $generalErr = "";
+$username = $email = $password = $confirm_password = "";
+
+// Handle the form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Validate username
+    if (empty($username)) {
+        $usernameErr = "Username is required";
+    }
+
+    // Validate email
+    if (empty($email)) {
+        $emailErr = "Email is required";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $emailErr = "Invalid email format";
+    } else {
+        // Check if email is already taken
+        $sql = "SELECT id FROM users WHERE email = ?";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                $emailErr = "Email is already registered";
+            }
+            $stmt->close();
+        }
+    }
+
+    // Validate passwords
+    if (empty($password)) {
+        $passwordErr = "Password is required";
+    } elseif (strlen($password) < 6) {
+        $passwordErr = "Password must be at least 6 characters long";
+    }
+
+    // Check if the passwords match
+    if ($password !== $confirm_password) {
+        $passwordErr = "Passwords do not match";
+    }
+
+    // If no errors, insert the new admin into the database
+    if (empty($usernameErr) && empty($emailErr) && empty($passwordErr)) {
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT); // Hash the password
+
+        $role = 'admin';  // Admin role
+
+        $sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("ssss", $username, $email, $passwordHash, $role);
+            if ($stmt->execute()) {
+                $_SESSION['user_id'] = $stmt->insert_id; // Store admin user ID
+                $_SESSION['role'] = 'admin'; // Set session role to admin
+                header("Location: linked-code.php"); // Redirect to the admin's user management page
+                exit(); // Stop further script execution
+            } else {
+                $generalErr = "Error: " . $stmt->error;
+            }
+            $stmt->close();
+        }
+    }
+
+    $conn->close();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Register</title>
+    <link rel="stylesheet" href="admin-login.css">
+</head>
+<body>
+    <div class="register-container">
+        <h1>Admin Registration</h1>
+        
+        <!-- Display error if registration fails -->
+        <?php if ($generalErr): ?>
+            <div class="error-message"><?php echo $generalErr; ?></div>
+        <?php endif; ?>
+
+        <form action="admin-register.php" method="POST">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="<?php echo $username; ?>" required>
+            <span><?php echo $usernameErr; ?></span>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
+            <span><?php echo $emailErr; ?></span>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            <span><?php echo $passwordErr; ?></span>
+
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <span><?php echo $passwordErr; ?></span>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already registered? <a href="admin-login.php">Login</a></p>
+    </div>
+</body>
+</html>
